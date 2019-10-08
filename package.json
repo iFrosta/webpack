@@ -9,12 +9,24 @@
   "author": "@ifrosta",
   "license": "ISC",
   "devDependencies": {
+    "cssnano": "^4.1.10",
     "gulp": "^4.0.2",
-    "gulp-autoprefixer": "^7.0.0",
+    "gulp-autoprefixer": "^7.0.1",
     "gulp-cssmin": "^0.2.0",
     "gulp-postcss": "^8.0.0",
     "gulp-rename": "^1.4.0",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5"
+  },
+  "dependencies": {
+    "autoprefixer": "^9.6.4",
+    "browser-sync": "^2.26.7",
+    "gulp-cli": "^2.2.0",
+    "gulp-imagemin": "^6.1.1",
+    "gulp-newer": "^1.4.0",
+    "gulp-noop": "^1.0.0",
+    "gulp-size": "^3.0.0",
+    "postcss-assets": "^5.0.0",
+    "usedcss": "^1.0.7"
   }
 }
