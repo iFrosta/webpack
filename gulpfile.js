@@ -1,94 +1,137 @@
-(() => {
+"use strict";
 
-    'use strict';
+// Load plugins
+const autoprefixer = require("autoprefixer");
+const browsersync = require("browser-sync").create();
+const cp = require("child_process");
+const cssnano = require("cssnano");
+const del = require("del");
+const eslint = require("gulp-eslint");
+const gulp = require("gulp");
+const imagemin = require("gulp-imagemin");
+const newer = require("gulp-newer");
+const plumber = require("gulp-plumber");
+const postcss = require("gulp-postcss");
+const rename = require("gulp-rename");
+const sass = require("gulp-sass");
+const webpack = require("webpack");
+const webpackconfig = require("./webpack.config.js");
+const webpackstream = require("webpack-stream");
 
-    /**************** gulpfile.js configuration ****************/
-
-    const
-
-        // development or production
-        devBuild  = ((process.env.NODE_ENV || 'development').trim().toLowerCase() === 'development'),
-
-        // directory locations
-        dir = {
-            src         : 'src/',
-            build       : 'build/'
+// BrowserSync
+function browserSync(done) {
+    browsersync.init({
+        server: {
+            baseDir: "./_site/"
         },
+        port: 3000
+    });
+    done();
+}
 
-        // modules
-        gulp          = require('gulp'),
-        noop          = require('gulp-noop'),
-        newer         = require('gulp-newer'),
-        size          = require('gulp-size'),
-        imagemin      = require('gulp-imagemin'),
-        sass          = require('gulp-sass'),
-        postcss       = require('gulp-postcss'),
-        sourcemaps    = devBuild ? require('gulp-sourcemaps') : null,
-        browsersync   = devBuild ? require('browser-sync').create() : null;
+// BrowserSync Reload
+function browserSyncReload(done) {
+    browsersync.reload();
+    done();
+}
 
-    /**************** CSS task ****************/
-    const cssConfig = {
+// Clean assets
+function clean() {
+    return del(["./_site/assets/"]);
+}
 
-        src         : dir.src + 'scss/main.scss',
-        watch       : dir.src + 'scss/**/*',
-        build       : dir.build + 'css/',
-        sassOpts: {
-            sourceMap       : devBuild,
-            imagePath       : '/images/',
-            precision       : 3,
-            errLogToConsole : true
-        },
+// Optimize Images
+function images() {
+    return gulp
+        .src("./assets/img/**/*")
+        .pipe(newer("./_site/assets/img"))
+        .pipe(
+            imagemin([
+                imagemin.gifsicle({ interlaced: true }),
+                imagemin.jpegtran({ progressive: true }),
+                imagemin.optipng({ optimizationLevel: 5 }),
+                imagemin.svgo({
+                    plugins: [
+                        {
+                            removeViewBox: false,
+                            collapseGroups: true
+                        }
+                    ]
+                })
+            ])
+        )
+        .pipe(gulp.dest("./_site/assets/img"));
+}
 
-        postCSS: [
-            require('usedcss')({
-                html: ['index.html']
-            }),
-            require('postcss-assets')({
-                loadPaths: ['images/'],
-                basePath: dir.build
-            }),
-            require('autoprefixer')({
-                browsers: ['> 1%']
-            }),
-            require('cssnano')
-        ]
+// CSS task
+function css() {
+    return gulp
+        .src("./assets/scss/**/*.scss")
+        .pipe(plumber())
+        .pipe(sass({ outputStyle: "expanded" }))
+        .pipe(gulp.dest("./_site/assets/css/"))
+        .pipe(rename({ suffix: ".min" }))
+        .pipe(postcss([autoprefixer(), cssnano()]))
+        .pipe(gulp.dest("./_site/assets/css/"))
+        .pipe(browsersync.stream());
+}
 
-    };
+// Lint scripts
+function scriptsLint() {
+    return gulp
+        .src(["./assets/js/**/*", "./gulpfile.js"])
+        .pipe(plumber())
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError());
+}
 
-    function css() {
+// Transpile, concatenate and minify scripts
+function scripts() {
+    return (
+        gulp
+            .src(["./assets/js/**/*"])
+            .pipe(plumber())
+            .pipe(webpackstream(webpackconfig, webpack))
+            // folder only, filename is specified in webpack config
+            .pipe(gulp.dest("./_site/assets/js/"))
+            .pipe(browsersync.stream())
+    );
+}
 
-        return gulp.src(cssConfig.src)
-            .pipe(sourcemaps ? sourcemaps.init() : noop())
-            .pipe(sass(cssConfig.sassOpts).on('error', sass.logError))
-            .pipe(postcss(cssConfig.postCSS))
-            .pipe(sourcemaps ? sourcemaps.write() : noop())
-            .pipe(size({ showFiles: true }))
-            .pipe(gulp.dest(cssConfig.build))
-            .pipe(browsersync ? browsersync.reload({ stream: true }) : noop());
+// Jekyll
+function jekyll() {
+    return cp.spawn("bundle", ["exec", "jekyll", "build"], { stdio: "inherit" });
+}
 
-    }
-    exports.css = gulp.series(images, css);
+// Watch files
+function watchFiles() {
+    gulp.watch("./assets/scss/**/*", css);
+    gulp.watch("./assets/js/**/*", gulp.series(scriptsLint, scripts));
+    gulp.watch(
+        [
+            "./_includes/**/*",
+            "./_layouts/**/*",
+            "./_pages/**/*",
+            "./_posts/**/*",
+            "./_projects/**/*"
+        ],
+        gulp.series(jekyll, browserSyncReload)
+    );
+    gulp.watch("./assets/img/**/*", images);
+}
 
-    /**************** images task ****************/
-    const imgConfig = {
-        src           : dir.src + 'img/**/*',
-        build         : dir.build + 'img/',
-        minOpts: {
-            optimizationLevel: 5
-        }
-    };
+// define complex tasks
+const js = gulp.series(scriptsLint, scripts);
+const build = gulp.series(clean, gulp.parallel(css, images, jekyll, js));
+const watch = gulp.parallel(watchFiles, browserSync);
 
-    function images() {
-
-        return gulp.src(imgConfig.src)
-            .pipe(newer(imgConfig.build))
-            .pipe(imagemin(imgConfig.minOpts))
-            .pipe(size({ showFiles:true }))
-            .pipe(gulp.dest(imgConfig.build));
-
-    }
-    exports.images = images;
-
-    console.log('Gulp', devBuild ? 'development' : 'production', 'build');
-
-})();
+// export tasks
+exports.images = images;
+exports.css = css;
+exports.js = js;
+exports.jekyll = jekyll;
+exports.clean = clean;
+exports.build = build;
+exports.watch = watch;
+exports.default = build;
