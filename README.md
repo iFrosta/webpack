@@ -1,4 +1,5 @@
 # WAT - Web App Template
+![WAT](data/logo.png)
 **WAT** - made by [@ifrosta](https://github.com/iFrosta) for quick start of Web projects
 
 ### Features:
@@ -14,7 +15,7 @@
 * configured git
 * ...
 
-###Web App Structure
+### Web App Structure
 * dist -  **project ready**
     * config/
     * data/
@@ -36,12 +37,12 @@
 
 **Versions:** (package.json)
 ```
-"devDependencies": {
-"autoprefixer": "^9.6.4",
-"browser-sync": "^2.26.7",
-"cssnano": "^4.1.10",
-"gulp": "^4.0.2",
-"gulp-postcss": "^8.0.0",
-"gulp-sass": "^4.0.2",
-"gulp-sourcemaps": "^2.6.5"
+    "devDependencies": {
+    "autoprefixer": "^9.6.4",
+    "browser-sync": "^2.26.7",
+    "cssnano": "^4.1.10",
+    "gulp": "^4.0.2",
+    "gulp-postcss": "^8.0.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-sourcemaps": "^2.6.5"
 ```

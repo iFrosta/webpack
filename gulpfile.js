@@ -4,7 +4,10 @@ let gulp = require("gulp"),
     autoprefixer = require("autoprefixer"),
     cssnano = require("cssnano"),
     sourcemaps = require("gulp-sourcemaps"),
-    browserSync = require("browser-sync").create();
+    browserSync = require("browser-sync").create(),
+    uglify = require('gulp-uglify'),
+    concat = require('gulp-concat'),
+    replace = require('gulp-replace');
 
 let paths = {
     styles: {
@@ -30,6 +33,25 @@ function style() {
         // Add browsersync stream pipe after compilation
         .pipe(browserSync.stream());
 }
+
+// JS task: concatenates and uglifies JS files to script.js
+function jsTask(){
+    return src([
+        files.src
+        //,'!' + 'includes/js/jquery.min.js', // to exclude any specific files
+    ])
+        .pipe(concat('all.js'))
+        .pipe(uglify())
+        .pipe(dest('dist')
+        );
+}
+
+// let cbString = new Date().getTime();
+// function cacheBustTask(){
+//     return src(['index.html'])
+//         .pipe(replace(/cb=\d+/, 'cb=' + cbString))
+//         .pipe(dest('.'));
+// }
 
 // A simple task to reload the page
 function reload() {

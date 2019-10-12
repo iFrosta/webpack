@@ -31,5 +31,10 @@
   "bugs": {
     "url": "https://github.com/iFrosta/WebAppTemplate/issues"
   },
-  "homepage": "https://github.com/iFrosta/WebAppTemplate#readme"
+  "homepage": "https://github.com/iFrosta/WebAppTemplate#readme",
+  "dependencies": {
+    "gulp-concat": "^2.6.1",
+    "gulp-replace": "^1.0.0",
+    "gulp-uglify": "^3.0.2"
+  }
 }
