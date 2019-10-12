@@ -1,2 +1,42 @@
-// main.scss
-@import 'base/_base';
+body {
+  background: #000;
+}
+
+.test {
+  background-color: black;
+  display: flex;
+  text-align: center;
+}
+
+.flex-test {
+  display: flex;
+  flex-wrap: wrap-reverse;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.flex-text .child {
+  flex: 1;
+}
+
+.flex-text .child.noflex {
+  flex: none;
+}
+
+.check {
+  display: flex;
+  flex-direction: column;
+}
+
+::placeholder {
+  color: gray;
+}
+
+.image {
+  background-image: url(image@1x.png);
+}
+@media (min-resolution: 2dppx) {
+  .image {
+    background-image: url(image@2x.png);
+  }
+}

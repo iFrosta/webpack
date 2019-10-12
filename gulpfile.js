@@ -1,137 +1,81 @@
-"use strict";
+let gulp = require("gulp"),
+    sass = require("gulp-sass"),
+    postcss = require("gulp-postcss"),
+    autoprefixer = require("autoprefixer"),
+    cssnano = require("cssnano"),
+    sourcemaps = require("gulp-sourcemaps"),
+    browserSync = require("browser-sync").create();
 
-// Load plugins
-const autoprefixer = require("autoprefixer");
-const browsersync = require("browser-sync").create();
-const cp = require("child_process");
-const cssnano = require("cssnano");
-const del = require("del");
-const eslint = require("gulp-eslint");
-const gulp = require("gulp");
-const imagemin = require("gulp-imagemin");
-const newer = require("gulp-newer");
-const plumber = require("gulp-plumber");
-const postcss = require("gulp-postcss");
-const rename = require("gulp-rename");
-const sass = require("gulp-sass");
-const webpack = require("webpack");
-const webpackconfig = require("./webpack.config.js");
-const webpackstream = require("webpack-stream");
+let paths = {
+    styles: {
+        // By using styles/**/*.sass we're telling gulp to check all folders for any sass file
+        src: "src/scss/*.scss",
+        // Compiled files will end up in whichever folder it's found in (partials are not compiled)
+        dest: "src/css"
+    }
+};
 
-// BrowserSync
-function browserSync(done) {
-    browsersync.init({
-        server: {
-            baseDir: "./_site/"
-        },
-        port: 3000
-    });
-    done();
-}
-
-// BrowserSync Reload
-function browserSyncReload(done) {
-    browsersync.reload();
-    done();
-}
-
-// Clean assets
-function clean() {
-    return del(["./_site/assets/"]);
-}
-
-// Optimize Images
-function images() {
+function style() {
     return gulp
-        .src("./assets/img/**/*")
-        .pipe(newer("./_site/assets/img"))
-        .pipe(
-            imagemin([
-                imagemin.gifsicle({ interlaced: true }),
-                imagemin.jpegtran({ progressive: true }),
-                imagemin.optipng({ optimizationLevel: 5 }),
-                imagemin.svgo({
-                    plugins: [
-                        {
-                            removeViewBox: false,
-                            collapseGroups: true
-                        }
-                    ]
-                })
-            ])
-        )
-        .pipe(gulp.dest("./_site/assets/img"));
-}
-
-// CSS task
-function css() {
-    return gulp
-        .src("./assets/scss/**/*.scss")
-        .pipe(plumber())
-        .pipe(sass({ outputStyle: "expanded" }))
-        .pipe(gulp.dest("./_site/assets/css/"))
-        .pipe(rename({ suffix: ".min" }))
+        .src(paths.styles.src)
+        // Initialize sourcemaps before compilation starts
+        .pipe(sourcemaps.init())
+        .pipe(sass())
+        .on("error", sass.logError)
+        // Use postcss with autoprefixer and compress the compiled file using cssnano
         .pipe(postcss([autoprefixer(), cssnano()]))
-        .pipe(gulp.dest("./_site/assets/css/"))
-        .pipe(browsersync.stream());
+        // Now add/write the sourcemaps
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest(paths.styles.dest))
+        // Add browsersync stream pipe after compilation
+        .pipe(browserSync.stream());
 }
 
-// Lint scripts
-function scriptsLint() {
-    return gulp
-        .src(["./assets/js/**/*", "./gulpfile.js"])
-        .pipe(plumber())
-        .pipe(eslint())
-        .pipe(eslint.format())
-        .pipe(eslint.failAfterError());
+// A simple task to reload the page
+function reload() {
+    browserSync.reload();
 }
 
-// Transpile, concatenate and minify scripts
-function scripts() {
-    return (
-        gulp
-            .src(["./assets/js/**/*"])
-            .pipe(plumber())
-            .pipe(webpackstream(webpackconfig, webpack))
-            // folder only, filename is specified in webpack config
-            .pipe(gulp.dest("./_site/assets/js/"))
-            .pipe(browsersync.stream())
-    );
+
+// Add browsersync initialization at the start of the watch task
+function watch() {
+    browserSync.init({
+        // You can tell browserSync to use this directory and serve it as a mini-server
+        server: {
+            baseDir: "./src"
+        }
+        // If you are already serving your website locally using something like apache
+        // You can use the proxy setting to proxy that instead
+        // proxy: "yourlocal.dev"
+    });
+    gulp.watch(paths.styles.src, style);
+    // We should tell gulp which files to watch to trigger the reload
+    // This can be html or whatever you're using to develop your website
+    // Note -- you can obviously add the path to the Paths object
+    gulp.watch("src/*.html", reload);
 }
 
-// Jekyll
-function jekyll() {
-    return cp.spawn("bundle", ["exec", "jekyll", "build"], { stdio: "inherit" });
-}
 
-// Watch files
-function watchFiles() {
-    gulp.watch("./assets/scss/**/*", css);
-    gulp.watch("./assets/js/**/*", gulp.series(scriptsLint, scripts));
-    gulp.watch(
-        [
-            "./_includes/**/*",
-            "./_layouts/**/*",
-            "./_pages/**/*",
-            "./_posts/**/*",
-            "./_projects/**/*"
-        ],
-        gulp.series(jekyll, browserSyncReload)
-    );
-    gulp.watch("./assets/img/**/*", images);
-}
 
-// define complex tasks
-const js = gulp.series(scriptsLint, scripts);
-const build = gulp.series(clean, gulp.parallel(css, images, jekyll, js));
-const watch = gulp.parallel(watchFiles, browserSync);
-
-// export tasks
-exports.images = images;
-exports.css = css;
-exports.js = js;
-exports.jekyll = jekyll;
-exports.clean = clean;
-exports.build = build;
+// Don't forget to expose the task!
 exports.watch = watch;
-exports.default = build;
+
+// Expose the task by exporting it
+// This allows you to run it from the commandline using
+// $ gulp style
+exports.style = style;
+
+/*
+ * Specify if tasks run in series or parallel using `gulp.series` and `gulp.parallel`
+ */
+let build = gulp.parallel(style, watch);
+
+/*
+ * You can still use `gulp.task` to expose tasks
+ */
+gulp.task('build', build);
+
+/*
+ * Define default task that can be called by just running `gulp` from cli
+ */
+gulp.task('default', build);
