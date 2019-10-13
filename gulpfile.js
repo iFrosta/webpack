@@ -9,7 +9,8 @@ const uglify = require('gulp-uglify');
 const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
 const cssnano = require('cssnano');
-let replace = require('gulp-replace');
+// let replace = require('gulp-replace');
+// let browserSync = require("browser-sync").create();
 
 // Global Destination
 const dist = 'dist/public/';
@@ -19,7 +20,7 @@ const dev = 'src/';
 const files = {
     scssPath: dev + 'scss/**/*.scss',
     jsPath: dev + 'js/**/*.js',
-    indexPath: dev + '**.html'
+    // indexPath: dev + '**.html'
 }
 
 // Sass task: compiles the style.scss file into style.css
@@ -45,36 +46,58 @@ function jsTask(){
         );
 }
 
-function copy() {
-    return src('src/index.html')
-        .pipe(dest(dist));
-}
+// function copy() {
+//     return src('src/index.html')
+//         .pipe(dest(dist));
+// }
 
 // Cachebust
-let cbString = new Date().getTime();
-function cacheBustTask(){
-    return src([dist + '/index.html'])
-        .pipe(replace(/cb=\d+/g, 'cb=' + cbString))
-        .pipe(dest(dev));
-}
+// let cbString = new Date().getTime();
+// function cacheBustTask(){
+//     return src([dist + '/index.html'])
+//         .pipe(replace(/cb=\d+/g, 'cb=' + cbString))
+//         .pipe(dest(dev));
+// }
 
 // function copyCSS() {
 //     return src( dist + 'public/css/**')
 //         .pipe(dest(dev + '/css/'));
 // }
 
+// // A simple task to reload the page
+// function reload() {
+//     browserSync.reload();
+// }
+//
+// // Add browsersync initialization at the start of the watch task
+// function liveReload() {
+//     browserSync.init({
+//         // You can tell browserSync to use this directory and serve it as a mini-server
+//         server: {
+//             baseDir: "./src"
+//         }
+//         // If you are already serving your website locally using something like apache
+//         // You can use the proxy setting to proxy that instead
+//         // proxy: "yourlocal.dev"
+//     });
+//     // We should tell gulp which files to watch to trigger the reload
+//     // This can be html or whatever you're using to develop your website
+//     // Note -- you can obviously add the path to the Paths object
+//     watch("src/*.html", reload);
+// }
+
 // Watch task: watch SCSS and JS files for changes
 // If any change, run scss and js tasks simultaneously
 function watchTask(){
-    watch([files.scssPath, files.jsPath, files.indexPath],
-        parallel(scssTask, jsTask, copy));
+    watch([files.scssPath, files.jsPath],
+        parallel(scssTask, jsTask));
 }
 
 // Export the default Gulp task so it can be run
 // Runs the scss and js tasks simultaneously
 // then runs cacheBust, then watch task
 exports.default = series(
-    parallel(scssTask, jsTask, copy),
-    cacheBustTask,
+    parallel(scssTask, jsTask),
+//    cacheBustTask,
     watchTask
 );
