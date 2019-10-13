@@ -5,6 +5,8 @@ Version prod:
 - [x] Autoprefixer
 - [x] CSS minify
 - [x] Js minify
+- [ ] Live Reload
+- [x] copy
 - [ ] Tests
 - [x] Include vendor scripts
 - [ ] configured git

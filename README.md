@@ -11,20 +11,22 @@ Choose one of the following options:
 - Clone the git repo — `git clone
   https://github.com/iFrosta/WebAppTemplate.git` 
 
-### Features:
+## Features:
 * Main Web App Structure
 * Gulp 
     * Sass
     * Autoprefixer
     * CSS minify
     * Js minify
+    * Live Reload
+    * Copy
     * ...
 * Tests
 * Include vendor scripts
 * configured git
 * ...
 
-### Web App Structure
+## Web App Structure
 * data -  **Template files**
 * dist -  **project ready**
     * config/

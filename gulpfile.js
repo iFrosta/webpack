@@ -13,11 +13,13 @@ let replace = require('gulp-replace');
 
 // Global Destination
 const dist = 'dist/public/';
+const dev = 'src/';
 
 // File paths
 const files = {
-    scssPath: 'src/scss/**/*.scss',
-    jsPath: 'src/js/**/*.js'
+    scssPath: dev + 'scss/**/*.scss',
+    jsPath: dev + 'js/**/*.js',
+    indexPath: dev + '**.html'
 }
 
 // Sass task: compiles the style.scss file into style.css
@@ -43,33 +45,36 @@ function jsTask(){
         );
 }
 
+function copy() {
+    return src('src/index.html')
+        .pipe(dest(dist));
+}
+
 // Cachebust
 let cbString = new Date().getTime();
 function cacheBustTask(){
-    return src(['src/index.html'])
+    return src([dist + '/index.html'])
         .pipe(replace(/cb=\d+/g, 'cb=' + cbString))
-        .pipe(dest('.'));
+        .pipe(dest(dev));
 }
 
-// function copy() {
-//     return src('src/index.html')
-//         .pipe(dest(dist));
+// function copyCSS() {
+//     return src( dist + 'public/css/**')
+//         .pipe(dest(dev + '/css/'));
 // }
-//
-// exports.copy = copy;
 
 // Watch task: watch SCSS and JS files for changes
 // If any change, run scss and js tasks simultaneously
 function watchTask(){
-    watch([files.scssPath, files.jsPath],
-        parallel(scssTask, jsTask));
+    watch([files.scssPath, files.jsPath, files.indexPath],
+        parallel(scssTask, jsTask, copy));
 }
 
 // Export the default Gulp task so it can be run
 // Runs the scss and js tasks simultaneously
 // then runs cacheBust, then watch task
 exports.default = series(
-    parallel(scssTask, jsTask),
+    parallel(scssTask, jsTask, copy),
     cacheBustTask,
     watchTask
 );
