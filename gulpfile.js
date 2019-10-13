@@ -13,13 +13,13 @@ const cssnano = require('cssnano');
 // let browserSync = require("browser-sync").create();
 
 // Global Destination
-const dist = 'dist/public/';
-const dev = 'src/';
+const dist = 'dist/public/'; // Tasks destination
+const dev = 'src/'; // Dev of project
 
 // File paths
 const files = {
-    scssPath: dev + 'scss/**/*.scss',
-    jsPath: dev + 'js/**/*.js',
+    scssPath: dev + 'scss/**/*.scss', // Path to scss in dev
+    jsPath: dev + 'js/**/*.js', // Path to js in dev
     // indexPath: dev + '**.html'
 }
 
