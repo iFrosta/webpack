@@ -10,6 +10,7 @@ Choose one of the following options:
   [https://github.com/iFrosta/WebAppTemplate](https://github.com/iFrosta/WebAppTemplate/).
 - Clone the git repo — `git clone
   https://github.com/iFrosta/WebAppTemplate.git` 
+- Template ready to use
 
 ## Features:
 * Main Web App Structure
@@ -18,8 +19,8 @@ Choose one of the following options:
     * Autoprefixer
     * CSS minify
     * Js minify
-    * Live Reload
-    * Copy
+    * ~~Live Reload~~
+    * ~~Copy~~
     * ...
 * Tests
 * Include vendor scripts
@@ -38,25 +39,31 @@ Choose one of the following options:
         * fonts/
         * img/
         * js/
-            * vendor ( jQuery )
+            * vendor
         * index. html / php / js
     * views/
 * node_modules
 * src -  **project development**
     * scss/
     * js/
-    * index. html / php / js
 * test
 * [ other project files ]
 
-**Versions:** (package.json)
+## Versions: 
 ```
-    "devDependencies": {
-    "autoprefixer": "^9.6.4",
-    "browser-sync": "^2.26.7",
-    "cssnano": "^4.1.10",
-    "gulp": "^4.0.2",
-    "gulp-postcss": "^8.0.0",
-    "gulp-sass": "^4.0.2",
-    "gulp-sourcemaps": "^2.6.5"
+  "devDependencies": {
+  "autoprefixer": "^9.6.4",
+  "browser-sync": "^2.26.7",
+  "cssnano": "^4.1.10",
+  "gulp": "^4.0.2",
+  "gulp-postcss": "^8.0.0",
+  "gulp-sass": "^4.0.2",
+  "gulp-sourcemaps": "^2.6.5"
+  }
+  "dependencies": {
+    "gulp-concat": "^2.6.1",
+    "gulp-replace": "^1.0.0",
+    "gulp-uglify": "^3.0.2"
+  }
 ```
+**(package.json)**
