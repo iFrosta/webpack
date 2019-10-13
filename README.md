@@ -2,6 +2,15 @@
 ![WAT](data/logo.png)
 **WAT** - made by [@ifrosta](https://github.com/iFrosta) for quick start of Web projects
 
+## Quick start
+
+Choose one of the following options:
+
+- Download as zip
+  [https://github.com/iFrosta/WebAppTemplate](https://github.com/iFrosta/WebAppTemplate/).
+- Clone the git repo — `git clone
+  https://github.com/iFrosta/WebAppTemplate.git` 
+
 ### Features:
 * Main Web App Structure
 * Gulp 
@@ -16,22 +25,25 @@
 * ...
 
 ### Web App Structure
+* data -  **Template files**
 * dist -  **project ready**
     * config/
     * data/
     * engine/
     * public/
         * css/
+            * normalize.css
         * fonts/
         * img/
         * js/
+            * vendor ( jQuery )
+        * index. html / php / js
     * views/
 * node_modules
 * src -  **project development**
-    * css/
     * scss/
     * js/
-    * index. html / php
+    * index. html / php / js
 * test
 * [ other project files ]
 

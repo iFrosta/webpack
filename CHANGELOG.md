@@ -4,7 +4,7 @@ Version prod:
 - [x] Sass
 - [x] Autoprefixer
 - [x] CSS minify
-- [ ] Js minify
+- [x] Js minify
 - [ ] Tests
-- [ ] Include vendor scripts
+- [x] Include vendor scripts
 - [ ] configured git
