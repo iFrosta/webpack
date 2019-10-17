@@ -31,7 +31,7 @@ Choose one of the following options:
   ```
 - Check [Web App Structure](#WebAppStructure)
 
-##Contents:
+## Contents:
 - [Introduction](#Introduction) <br>
 - [Quick Start](#QuickStart) <br>
 - [Features](#WebAppStructure) <br>
