@@ -1,2 +1,0 @@
-<?php
-// point of entry
